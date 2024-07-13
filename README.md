@@ -1,4 +1,4 @@
-# dategpt
+# OneClick Design
 
 ## Project setup
 ```

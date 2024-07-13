@@ -1,125 +1,115 @@
 <template>
   <div class="home">
-    <div style="height: 100px"></div>
+    <div class="home-content">
+      <img alt="Vue logo" src="../assets/logo.png" class="logo main-logo" />
+      <h1 style="text-shadow: 2px 2px #000">With One Click</h1>
+      <button @click="signInWithYouTube">Sign In with YouTube</button>
+      <h3 style="font-size: 2em">Create An AI for your YouTube Channel</h3>
+    </div>
     <div
-      class="home"
-      style="
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100%;
-      "
+      v-if="showSuccessPopUp"
+      class="pop-up pop-up--visible"
+      @click="closePopUp"
     >
-      <img alt="Vue logo" src="../assets/date-gpt.png" style="width: 100%" />
+      <p>Success! You'll be notified when your access is ready!</p>
     </div>
-    <div>
-      <h1>Dating Powered By ChatGPT</h1>
-      <form>
-        <input
-          type="email"
-          id="email"
-          v-model="email"
-          placeholder=" Enter Your Email"
-          style="
-            width: 50%;
-            height: 30px;
-            padding: 5px;
-            text-align: left;
-            border-radius: 5px;
-          "
-          ref="emailInput"
-          autofocus
-        />
-        <button
-          @click.prevent="submitForm"
-          style="
-            height: 45px;
-            width: auto;
-            margin-left: 10px;
-            border-radius: 5px;
-            border-color: white;
-            background-color: transparent;
-            color: white;
-            font-weight: bold;
-          "
-        >
-          Request Access
-        </button>
-      </form>
-      <h3>Find Your Perfect Match</h3>
-    </div>
-    <div v-if="showSuccessPopUp" class="pop-up pop-up--visible">
-      <p style="font-size: 32px; font-weight: bold; color: white">
-        Success! You'll be notified when we're ready!
-      </p>
-    </div>
-    <div v-if="showWarningPopUp" class="pop-up pop-up--visible">
-      <p style="font-size: 32px; font-weight: bold; color: white">
-        Please enter a valid email address
-      </p>
-    </div>
+    <div v-else class="pop-up"></div>
   </div>
 </template>
-
 <script>
-import axios from "axios";
-
 export default {
   data() {
     return {
-      email: "",
       showSuccessPopUp: false,
-      showWarningPopUp: false,
     };
   },
   methods: {
-    async submitForm() {
-      if (!this.email || !this.email.includes("@")) {
-        this.showWarningPopUp = true;
-        return;
-      }
-      this.showWarningPopUp = false;
+    signInWithYouTube() {
+      const clientId =
+        "814361337327-7mv4tt1icdimtiboj2gv2440mj47ego9.apps.googleusercontent.com";
+      const redirectUri = "https://app.oneclick.design";
+      
+      const responseType = "code";
+      const scope = "https://www.googleapis.com/auth/youtube.readonly";
+      const accessType = "offline";
 
-      try {
-        const baseId = "appT10urxddoqMb1B";
-        const tableIdOrName = "DateGPT";
-        const url = `https://api.airtable.com/v0/${baseId}/${tableIdOrName}`;
-        const headers = {
-          Authorization:
-            "Bearer patjNGU5k25EgovKk.af1ce909b8364b9ff0e45b2e3cef84e6fc7e0d88e3f59e783a9c4bb964f4b8df",
-          "Content-Type": "application/json",
-        };
-        const data = {
-          fields: {
-            Email: this.email,
-          },
-        };
-        const response = await axios.post(url, data, { headers });
-        console.log("Email saved to Airtable");
-        console.log(response.data);
-        this.showSuccessPopUp = true;
-      } catch (error) {
-        console.error(error);
-      }
+      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(
+        redirectUri
+      )}&response_type=${responseType}&scope=${encodeURIComponent(
+        scope
+      )}&access_type=${accessType}`;
+
+      window.location.href = authUrl;
+    },
+    closePopUp() {
+      this.showSuccessPopUp = false;
     },
   },
-  computed: {
-    successPopUpClass() {
-      return {
-        "pop-up": true,
-        "pop-up--visible": this.showSuccessPopUp,
-      };
-    },
-  },
-  mounted() {
-  this.$refs.emailInput.focus();
-}
-
 };
 </script>
 <style scoped>
-h1 h3 {
-  text-shadow: 1px 1px 2px black;
+.home {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  overflow: hidden;
+  max-height: calc(100vh - 50px);
+}
+
+body {
+  overflow: hidden;
+}
+
+.home-content {
+  max-width: 400px;
+  text-align: center;
+  padding: 20px;
+}
+
+.logo {
+  width: 350px;
+  height: auto;
+}
+
+button {
+  background-color: #ee4d6d;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.pop-up {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.7);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.pop-up--visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.pop-up p {
+  background-color: white;
+  color: #ee4d6d;
+  padding: 20px;
+  font-size: 18px;
+  text-align: center;
+  border-radius: 4px;
 }
 </style>
-
